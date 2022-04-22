@@ -25,6 +25,7 @@
       $user_item = array(
         'name' => $name,
         'email' => $email,
+        'password' => $password,
         'english_level' => $english_level,
         'url_cv' => $url_cv,
         'tech_knowledge' => $tech_knowledge,

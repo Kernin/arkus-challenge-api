@@ -16,6 +16,7 @@
     $user_arr = array(
       'name' => $user->name,
       'email' => $user->email,
+      'password' => $user->password,
       'english_level' => $user->english_level,
       'url_cv' => $user->url_cv,
       'tech_knowledge' => $user->tech_knowledge,
