@@ -13,8 +13,8 @@ class AccountBO
 
   public function getAllAccounts()
   {
-    $query = 'SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name, m.team_id FROM (
-        SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name, t.id as team_id 
+    $query = 'SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (
+        SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name 
         FROM accountmanager as ac, account as a, user as u, team as t 
         WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id
       ) as m';
@@ -27,8 +27,8 @@ class AccountBO
 
   public function getAccount($account_id)
   {
-    $query = 'SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name, m.team_id FROM (
-        SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name, t.id as team_id 
+    $query = 'SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (
+        SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name 
         FROM accountmanager as ac, account as a, user as u, team as t 
         WHERE ac.account_id = :current_account_id AND ac.email = u.email AND t.account_id = :current_account_id
       ) as m';
