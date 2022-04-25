@@ -98,7 +98,7 @@
     }
 
     public function deleteUser($email){
-      $query = 'DELETE FROM user where email=:email';
+      $query = 'DELETE FROM '. $this->table .' WHERE email=:email';
       $statement = $this->conn->prepare($query);
 
       $email = htmlspecialchars(strip_tags($email));
