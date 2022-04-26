@@ -13,7 +13,7 @@ exports.create = (request, response) => {
     if (err) {
       if (err.code === "ER_DUP_ENTRY") {
         response.status(400).send({
-          error: "User alreay exists.",
+          message: "User alreay exists.",
         });
       } else {
         response.status(500).send({
@@ -26,11 +26,19 @@ exports.create = (request, response) => {
 };
 
 exports.findAll = (request, response) => {
-  request.body.getAll((err, data) => {
-    if (err)
-      response.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
-      });
+  let email = request.query.email;
+  User.getAll(email, (err, data) => {
+    if (err){
+      if (err.kind === "not_found") {
+        response.status(404).send({
+          message: `Not found User with id ${email} .`
+        });
+      } else {
+        response.status(500).send({
+          message: err.message || "Some error occurred while retrieving users.",
+        });
+      }
+    }
     else response.send(data);
   });
 };
