@@ -1,5 +1,6 @@
 <?php 
   header('Access-Control-Allow-Origin: *');
+  header("Access-Control-Allow-Headers: *");
   header('Content-Type: application/json');
 
   include_once '../../config/Database.php';
@@ -10,10 +11,12 @@
 
   $user_logic= new UserBO($db);
 
-  if(isset($_GET['email']) && isset($_GET['password'])){
-    $user = $user_logic->getUser($_GET['email']);
+  $data = json_decode(file_get_contents('php://input'));
 
-    $credential_validation=validateUserCredentials($user,  $_GET['email'], $_GET['password']);
+  if(isset($data->email) && isset($data->password)){
+    $user = $user_logic->getUser($data->email);
+
+    $credential_validation=validateUserCredentials($user,  $data->email, $data->password);
     createResponse($user,$credential_validation);
   } else {
     die();
