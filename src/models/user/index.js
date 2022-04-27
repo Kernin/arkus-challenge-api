@@ -26,7 +26,6 @@ User.getAll = (email,result) => {
   let query = "SELECT * FROM user";
 
   if(email){
-    //query += ` WHERE email = '${email}'`;
    return  User.findById(email,result)
   }
 

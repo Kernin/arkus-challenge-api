@@ -80,3 +80,35 @@ exports.delete = (request, response) => {
     } else response.send({ message: `User was deleted successfully!` });
   });
 };
+
+exports.login = (request, response) => {
+  if (!request.body) {
+    response.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+  const {email: currentEmail, password:currentPassword} = request.body
+  User.findById(currentEmail, (err, data)=>{
+    if (err) {
+      if (err.kind === "not_found") {
+        response.status(404).send({
+          message: `Not found User with email ${currentEmail}.`
+        });
+      } else {
+        response.status(500).send({
+          message: err.message || "Some error occurred while loging.",
+        });
+      }
+    } else {
+      const {email, password} = data
+      if(email === currentEmail && password === currentPassword){
+        response.send(data)
+      }
+      else {
+        response.status(400).send({
+          message: "Wrong credentials.",
+        });
+      }
+    };
+  })
+}
