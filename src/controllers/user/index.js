@@ -13,7 +13,7 @@ exports.create = (request, response) => {
     if (err) {
       if (err.code === "ER_DUP_ENTRY") {
         response.status(400).send({
-          message: "User alreay exists.",
+          message: "User already exists.",
         });
       } else {
         response.status(500).send({
@@ -49,7 +49,7 @@ exports.update = (request, response) => {
     });
   }
   console.log(request.body);
-  const {email} = request.body
+  const { email } = request.body;
   User.updateById(new User(request.body), (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -70,11 +70,11 @@ exports.delete = (request, response) => {
     if (err) {
       if (err.kind === "not_found") {
         response.status(404).send({
-          message: `Not found User with email ${request.params.email}.`
+          message: `Not found User with email ${request.params.email}.`,
         });
       } else {
         response.status(500).send({
-          message: `Could not delete User with email ${request.params.email}`
+          message: `Could not delete User with email ${request.params.email}`,
         });
       }
     } else response.send({ message: `User was deleted successfully!` });
@@ -87,12 +87,12 @@ exports.login = (request, response) => {
       message: "Content can not be empty!",
     });
   }
-  const {email: currentEmail, password:currentPassword} = request.body
-  User.findById(currentEmail, (err, data)=>{
+  const { email: currentEmail, password: currentPassword } = request.body;
+  User.findById(currentEmail, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         response.status(404).send({
-          message: `Not found User with email ${currentEmail}.`
+          message: `Not found User with email ${currentEmail}.`,
         });
       } else {
         response.status(500).send({
@@ -100,15 +100,14 @@ exports.login = (request, response) => {
         });
       }
     } else {
-      const {email, password} = data
-      if(email === currentEmail && password === currentPassword){
-        response.send(data)
-      }
-      else {
+      const { email, password } = data;
+      if (email === currentEmail && password === currentPassword) {
+        response.send(data);
+      } else {
         response.status(400).send({
           message: "Wrong credentials.",
         });
       }
-    };
-  })
-}
+    }
+  });
+};

@@ -19,6 +19,7 @@ app.use(cors(corsOptions));
 //Routes
 app.use(require("./routes/index"));
 require("./routes/user")(app);
+require("./routes/account")(app);
 
 // Starting the server
 app.listen(app.get("port"), () => {

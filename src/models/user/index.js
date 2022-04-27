@@ -22,11 +22,11 @@ User.create = (newUser, result) => {
   });
 };
 
-User.getAll = (email,result) => {
+User.getAll = (email, result) => {
   let query = "SELECT * FROM user";
 
-  if(email){
-   return  User.findById(email,result)
+  if (email) {
+    return User.findById(email, result);
   }
 
   sql.query(query, (err, res) => {
@@ -40,8 +40,7 @@ User.getAll = (email,result) => {
   });
 };
 
-
-User.findById = (email,result) => {
+User.findById = (email, result) => {
   sql.query(`SELECT * FROM user WHERE email = '${email}'`, (err, res) => {
     if (err) {
       console.log("error: ", err);
@@ -56,11 +55,12 @@ User.findById = (email,result) => {
 
     result({ kind: "not_found" }, null);
   });
-}
+};
 
 User.updateById = (user, result) => {
-  const {name, email, password, english_level, url_cv,tech_knowledge,role} = user
-  
+  const { name, email, password, english_level, url_cv, tech_knowledge, role } =
+    user;
+
   sql.query(
     "UPDATE user SET name = ?, password = ?, english_level = ?, url_cv = ?, tech_knowledge = ?, role = ? WHERE email = ?",
     [name, password, english_level, url_cv, tech_knowledge, role, email],
@@ -71,15 +71,14 @@ User.updateById = (user, result) => {
         return;
       }
       if (res.affectedRows == 0) {
-
         result({ kind: "not_found" }, null);
         return;
       }
-      console.log("updated tutorial: ", { email, ...user });
+      console.log("updated user: ", { email, ...user });
       result(null, { ...user });
     }
   );
-}
+};
 
 User.remove = (email, result) => {
   sql.query("DELETE FROM user WHERE email = ?", email, (err, res) => {
@@ -95,6 +94,6 @@ User.remove = (email, result) => {
     console.log("deleted user with email: ", email);
     result(null, res);
   });
-}
+};
 
 module.exports = User;
