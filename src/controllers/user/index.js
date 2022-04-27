@@ -28,17 +28,39 @@ exports.create = (request, response) => {
 exports.findAll = (request, response) => {
   let email = request.query.email;
   User.getAll(email, (err, data) => {
-    if (err){
+    if (err) {
       if (err.kind === "not_found") {
         response.status(404).send({
-          message: `Not found User with id ${email} .`
+          message: `Not found User with id ${email} .`,
         });
       } else {
         response.status(500).send({
           message: err.message || "Some error occurred while retrieving users.",
         });
       }
-    }
-    else response.send(data);
+    } else response.send(data);
+  });
+};
+
+exports.update = (request, response) => {
+  if (!request.body) {
+    response.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+  console.log(request.body);
+  const {email} = request.body
+  User.updateById(new User(request.body), (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        response.status(404).send({
+          message: `Not found User with id ${email} .`,
+        });
+      } else {
+        response.status(500).send({
+          message: `Error updating User with id ${email}`,
+        });
+      }
+    } else response.send(data);
   });
 };

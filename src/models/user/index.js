@@ -59,5 +59,28 @@ User.findById = (email,result) => {
   });
 }
 
+User.updateById = (user, result) => {
+  const {name, email, password, english_level, url_cv,tech_knowledge,role} = user
+  
+  sql.query(
+    "UPDATE user SET name = ?, password = ?, english_level = ?, url_cv = ?, tech_knowledge = ?, role = ? WHERE email = ?",
+    [name, password, english_level, url_cv, tech_knowledge, role, email],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+      if (res.affectedRows == 0) {
+
+        result({ kind: "not_found" }, null);
+        return;
+      }
+      console.log("updated tutorial: ", { email, ...user });
+      result(null, { ...user });
+    }
+  );
+}
+
 
 module.exports = User;
