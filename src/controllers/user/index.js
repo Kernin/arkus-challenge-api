@@ -64,3 +64,19 @@ exports.update = (request, response) => {
     } else response.send(data);
   });
 };
+
+exports.delete = (request, response) => {
+  User.remove(request.params.email, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        response.status(404).send({
+          message: `Not found User with email ${request.params.email}.`
+        });
+      } else {
+        response.status(500).send({
+          message: `Could not delete User with email ${request.params.email}`
+        });
+      }
+    } else response.send({ message: `User was deleted successfully!` });
+  });
+};

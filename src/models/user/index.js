@@ -82,5 +82,20 @@ User.updateById = (user, result) => {
   );
 }
 
+User.remove = (email, result) => {
+  sql.query("DELETE FROM user WHERE email = ?", email, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    if (res.affectedRows == 0) {
+      result({ kind: "not_found" }, null);
+      return;
+    }
+    console.log("deleted user with email: ", email);
+    result(null, res);
+  });
+}
 
 module.exports = User;
