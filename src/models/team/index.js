@@ -12,21 +12,18 @@ const Team = function (member) {
 Team.create = (newTeam, result) => {
   const values = newTeam.map((member) => Object.values(member));
   console.log(values);
-  const query = "INSERT IGNORE INTO team (email, account_id, init_date, end_date, name) VALUES ?"
-  
-  sql.query(
-    query,
-    [values],
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-      console.log("created team: ", { id: res.insertId, ...newTeam });
-      result(null, { id: res.insertId, ...newTeam });
+  const query =
+    "INSERT IGNORE INTO team (email, account_id, init_date, end_date, name) VALUES ?";
+
+  sql.query(query, [values], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
     }
-  );
+    console.log("created team: ", { id: res.insertId, ...newTeam });
+    result(null, { id: res.insertId, ...newTeam });
+  });
 };
 
 module.exports = Team;

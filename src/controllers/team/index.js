@@ -1,15 +1,15 @@
 const Team = require("../../models/team");
 
-exports.create =  (request, response) => {
+exports.create = (request, response) => {
   if (!request.body) {
     response.status(400).send({
       message: "Content can not be empty!",
     });
   }
-  console.log(request.body)
-  const {team} = request.body
-  const teamArr = team.map(member=>new Team(member));
-  
+  console.log(request.body);
+  const { team } = request.body;
+  const teamArr = team.map((member) => new Team(member));
+
   Team.create(teamArr, (err, data) => {
     if (err) {
       if (err.code === "ER_DUP_ENTRY") {
@@ -24,4 +24,4 @@ exports.create =  (request, response) => {
       }
     } else response.send(data);
   });
-}
+};
