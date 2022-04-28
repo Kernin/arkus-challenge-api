@@ -21,6 +21,7 @@ app.use(require("./routes/index"));
 require("./routes/user")(app);
 require("./routes/account")(app);
 require("./routes/manager")(app);
+require("./routes/team")(app);
 
 // Starting the server
 app.listen(app.get("port"), () => {

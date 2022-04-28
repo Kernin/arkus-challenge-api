@@ -21,7 +21,7 @@ exports.create = (request, response) => {
       }
     } else response.send(data);
   });
-}
+};
 
 exports.delete = (request, response) => {
   if (!request.body) {
@@ -43,4 +43,4 @@ exports.delete = (request, response) => {
       }
     } else response.send({ message: `Manager was deleted successfully!` });
   });
-}
+};

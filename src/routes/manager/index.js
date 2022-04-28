@@ -1,9 +1,9 @@
 module.exports = (app) => {
-  const user = require("../../controllers/manager");
+  const manager = require("../../controllers/manager");
   const router = require("express").Router();
 
-  router.post("/", user.create);
-  router.delete("/", user.delete);
+  router.post("/", manager.create);
+  router.delete("/", manager.delete);
 
   app.use("/api/manager", router);
 };
