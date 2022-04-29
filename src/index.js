@@ -18,6 +18,7 @@ app.use(cors(corsOptions));
 
 //Routes
 app.use(require("./routes/index"));
+require("./routes/auth")(app);
 require("./routes/user")(app);
 require("./routes/account")(app);
 require("./routes/manager")(app);

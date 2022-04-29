@@ -1,4 +1,5 @@
 const User = require("../../models/user");
+const jwt = require("jsonwebtoken");
 
 exports.create = (request, response) => {
   if (!request.body) {
@@ -38,7 +39,7 @@ exports.findAll = (request, response) => {
           message: err.message || "Some error occurred while retrieving users.",
         });
       }
-    } else response.send(data);
+    } else response.send({users:data});
   });
 };
 
@@ -102,6 +103,13 @@ exports.login = (request, response) => {
     } else {
       const { email, password } = data;
       if (email === currentEmail && password === currentPassword) {
+        const payload ={
+          check: true
+        }
+        const masterKey = process.env.MASTER_KEY
+        const token = jwt.sign(payload,masterKey,{expiresIn: 1440})
+        data.token=token
+
         response.send(data);
       } else {
         response.status(400).send({
