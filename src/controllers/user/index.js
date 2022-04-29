@@ -107,7 +107,7 @@ exports.login = (request, response) => {
           check: true
         }
         const masterKey = process.env.MASTER_KEY
-        const token = jwt.sign(payload,masterKey,{expiresIn: 1440})
+        const token = jwt.sign(payload,masterKey,{expiresIn: "8h"})
         data.token=token
 
         response.send(data);

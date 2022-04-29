@@ -23,7 +23,7 @@ User.create = (newUser, result) => {
 };
 
 User.getAll = (email, result) => {
-  let query = "SELECT * FROM user";
+  let query = "SELECT * FROM user WHERE role != 'super_admin'";
 
   if (email) {
     return User.findById(email, result);
