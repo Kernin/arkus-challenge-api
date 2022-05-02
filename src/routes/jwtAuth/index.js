@@ -2,10 +2,11 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (router) => {
   router.use((request, response, next) => {
-    const token = request.headers["authorization"]
-      .replace("Bearer", "")
-      .replaceAll(/\s/g, "");
+    let token = request.headers["authorization"]
+      
     if (token) {
+      token = token.replace("Bearer", "")
+      .replaceAll(/\s/g, "");
       const masterKey = process.env.MASTER_KEY;
       jwt.verify(token, masterKey, (err, decoded) => {
         if (err) {
