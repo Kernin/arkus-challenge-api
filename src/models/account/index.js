@@ -7,21 +7,24 @@ const Account = function (account) {
   this.manager_name = account.manager_name;
   this.manager_email = account.manager_email;
   this.team_name = account.team_name;
-  this.team_id = account.team_id;
 };
 
 Account.create = (newAccount, result) => {
-  const {name:accountName, client_name:clientName} = newAccount
-  sql.query("INSERT INTO account SET name = ?, client_name = ?", [accountName, clientName], (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(err, null);
-      return;
+  const { name: accountName, client_name: clientName } = newAccount;
+  sql.query(
+    "INSERT INTO account SET name = ?, client_name = ?",
+    [accountName, clientName],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+      console.log("created account: ", { id: res.insertId, ...newAccount });
+      result(null, { id: res.insertId, ...newAccount });
     }
-    console.log("created account: ", { id: res.insertId, ...newAccount });
-    result(null, { id: res.insertId, ...newAccount });
-  });
-}
+  );
+};
 
 Account.remove = (accountId, result) => {
   sql.query("DELETE FROM account WHERE id = ?", accountId, (err, res) => {
@@ -36,11 +39,23 @@ Account.remove = (accountId, result) => {
     }
     console.log("deleted account with id: ", accountId);
     result(null, res);
-  })
-}
+  });
+};
 
 Account.getAll = (result) => {
-  let query = "SELECT * FROM account";
+  let query = `SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (
+    SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name
+    FROM accountmanager as ac, account as a, user as u, team as t
+    WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id
+  ) as m
+
+UNION
+
+SELECT DISTINCT m.id, m.name, m.client_name, Null as manager_name, Null as email, Null as team_name FROM (
+    SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name
+    FROM accountmanager as ac, account as a, user as u, team as t
+    WHERE ac.account_id != a.id AND ac.email != u.email AND t.account_id != a.id
+  ) as m GROUP BY m.id`;
 
   sql.query(query, (err, res) => {
     if (err) {
@@ -51,10 +66,15 @@ Account.getAll = (result) => {
     console.log("accounts: ", res);
     result(null, res);
   });
-}
+};
 
 Account.findById = (id, result) => {
-  sql.query(`SELECT * FROM account WHERE id = '${id}'`, (err, res) => {
+  const query = `SELECT a.name, a.client_name, team.has_team FROM account as a, (
+    SELECT IF(COUNT(1) = 1, 'true', 'false') AS has_team
+    FROM team
+    WHERE account_id = '${id}'
+) as team WHERE id = '${id}'`;
+  sql.query(query, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -68,14 +88,15 @@ Account.findById = (id, result) => {
 
     result({ kind: "not_found" }, null);
   });
-}
+};
 
 Account.getAllAssigned = (result) => {
-  let query = "SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (" +
-    "SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name "+
-    "FROM accountmanager as ac, account as a, user as u, team as t "+
-    "WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id"+
-  ") as m";
+  let query =
+    "SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (" +
+    "SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name " +
+    "FROM accountmanager as ac, account as a, user as u, team as t " +
+    "WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id" +
+    ") as m";
 
   sql.query(query, (err, res) => {
     if (err) {
@@ -86,10 +107,10 @@ Account.getAllAssigned = (result) => {
     console.log("accounts: ", res);
     result(null, res);
   });
-}
+};
 
-Account.updateById = (account,result) =>{
-  const {name: accountName, client_name: clientName, id} = account;
+Account.updateById = (account, result) => {
+  const { name: accountName, client_name: clientName, id } = account;
   sql.query(
     "UPDATE account SET name = ?, client_name = ? WHERE id = ?",
     [accountName, clientName, id],
@@ -107,6 +128,6 @@ Account.updateById = (account,result) =>{
       result(null, { ...account });
     }
   );
-}
+};
 
 module.exports = Account;
