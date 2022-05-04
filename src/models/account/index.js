@@ -2,7 +2,7 @@ const sql = require("../db.js");
 
 const Account = function (account) {
   this.id = account.id;
-  this.account_name = account.account_name;
+  this.name = account.name;
   this.client_name = account.client_name;
   this.manager_name = account.manager_name;
   this.manager_email = account.manager_email;
@@ -11,7 +11,7 @@ const Account = function (account) {
 };
 
 Account.create = (newAccount, result) => {
-  const {account_name:accountName, client_name:clientName} = newAccount
+  const {name:accountName, client_name:clientName} = newAccount
   sql.query("INSERT INTO account SET name = ?, client_name = ?", [accountName, clientName], (err, res) => {
     if (err) {
       console.log("error: ", err);
@@ -89,7 +89,7 @@ Account.getAllAssigned = (result) => {
 }
 
 Account.updateById = (account,result) =>{
-  const {account_name: accountName, client_name: clientName, id} = account;
+  const {name: accountName, client_name: clientName, id} = account;
   sql.query(
     "UPDATE account SET name = ?, client_name = ? WHERE id = ?",
     [accountName, clientName, id],

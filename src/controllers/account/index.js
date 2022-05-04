@@ -53,7 +53,7 @@ exports.findAll = (request, response) => {
           message: err.message || "Some error occurred while retrieving accounts.",
         });
       }
-    } else response.send(data);
+    } else response.send({accounts:data});
    })
 }
 
@@ -69,7 +69,7 @@ exports.findOne = (request, response) => {
           message: "Error retrieving Account with id " + request.params.id
         });
       }
-    } else response.send(data);
+    } else response.send({account:data});
   })
 }
 
