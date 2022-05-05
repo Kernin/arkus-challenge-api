@@ -20,8 +20,8 @@ Account.create = (newAccount, result) => {
         result(err, null);
         return;
       }
-      console.log("created account: ", { id: res.insertId, ...newAccount });
-      result(null, { id: res.insertId, ...newAccount });
+      console.log("created account: ", {  ...newAccount,id: res.insertId });
+      result(null, { ...newAccount,id: res.insertId,  });
     }
   );
 };

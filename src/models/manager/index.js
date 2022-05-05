@@ -17,6 +17,22 @@ Manager.create = (newManager, result) => {
   });
 };
 
+Manager.getAvailableUsers = (result) => {
+  let query = `SELECT name, email FROM user WHERE 
+  NOT EXISTS (
+    SELECT email FROM accountmanager WHERE user.email = accountmanager.email)
+    AND user.role != 'super_admin'`;
+  sql.query(query, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    console.log("users: ", res);
+    result(null, res);
+  });
+};
+
 Manager.remove = (manager, result) => {
   const { email, account_id: accountId } = manager;
 

@@ -44,3 +44,15 @@ exports.delete = (request, response) => {
     } else response.send({ message: `Manager was deleted successfully!` });
   });
 };
+
+exports.findAllAvailableUsers = (request, response) => {
+  Manager.getAvailableUsers((err, data) => {
+    if (err) {
+      response.status(500).send({
+        message:
+          err.message ||
+          "Some error occurred while retrieving available managers.",
+      });
+    } else response.send({ users: data });
+  });
+};
