@@ -20,8 +20,8 @@ Account.create = (newAccount, result) => {
         result(err, null);
         return;
       }
-      console.log("created account: ", {  ...newAccount,id: res.insertId });
-      result(null, { ...newAccount,id: res.insertId,  });
+      console.log("created account: ", { ...newAccount, id: res.insertId });
+      result(null, { ...newAccount, id: res.insertId });
     }
   );
 };
@@ -43,19 +43,17 @@ Account.remove = (accountId, result) => {
 };
 
 Account.getAll = (result) => {
-  let query = `SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (
+  let query = `SELECT DISTINCT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (
     SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name
     FROM accountmanager as ac, account as a, user as u, team as t
     WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id
-  ) as m
+  ) as m GROUP BY m.id
 
-UNION
+  UNION
 
-SELECT DISTINCT m.id, m.name, m.client_name, Null as manager_name, Null as email, Null as team_name FROM (
-    SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name
-    FROM accountmanager as ac, account as a, user as u, team as t
-    WHERE ac.account_id != a.id AND ac.email != u.email AND t.account_id != a.id
-  ) as m GROUP BY m.id`;
+  SELECT DISTINCT a.id, a.client_name, a.name, Null as manager_name, Null as email, Null as team_name FROM account as a WHERE  NOT EXISTS 
+  ( SELECT am.account_id FROM accountmanager AS am WHERE  am.account_id = a.id) AND NOT EXISTS 
+  ( SELECT t.account_id FROM  team as t WHERE t.account_id = a.id)`;
 
   sql.query(query, (err, res) => {
     if (err) {

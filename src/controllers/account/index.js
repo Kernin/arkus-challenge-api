@@ -1,6 +1,7 @@
 const { request } = require("express");
 const Account = require("../../models/account");
 const Manager = require("../../models/manager");
+const Team = require("../../models/team")
 
 exports.create = (request, response) => {
   if (!request.body) {
@@ -30,6 +31,7 @@ exports.create = (request, response) => {
         response.send(data);
       } else {
         assignManager(data.id);
+        createTeam(data.id)
       }
     }
   });
@@ -49,9 +51,36 @@ exports.create = (request, response) => {
               err.message || "Some error occurred while creating the Manager.",
           });
         }
-      } else response.send(data);
+      }
     });
   };
+
+  const createTeam =(id)=>{
+    const {team:{name,members}} = request.body
+    const today = new Date()
+    const newTeam = members.map(({value:email})=>new Team({
+      email,
+      account_id:id,
+      init_date: today,
+      end_date: '0',
+      name
+    }))
+
+    Team.create(newTeam, (err, data) => {
+      if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          response.status(400).send({
+            message: "Team already exists.",
+          });
+        } else {
+          response.status(500).send({
+            message:
+              err.message || "Some error occurred while creating the Team.",
+          });
+        }
+      } else response.send({message: 'Account created successfully'});
+    });
+  }
 };
 
 exports.delete = (request, response) => {
