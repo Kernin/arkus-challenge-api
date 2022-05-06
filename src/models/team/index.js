@@ -25,4 +25,20 @@ Team.create = (newTeam, result) => {
   });
 };
 
+Team.getAll = (result) => {
+  const query = `SELECT a.name as account_name,u.name as user_name, t.email, t.name as team_name, t.init_date, t.end_date 
+  FROM team as t, user as u, account as a 
+  WHERE t.email = u.email and a.id = t.account_id GROUP BY t.email`;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    console.log("teams: ", res);
+    result(null, res);
+  });
+};
+
 module.exports = Team;

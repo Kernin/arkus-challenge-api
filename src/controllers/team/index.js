@@ -6,7 +6,6 @@ exports.create = (request, response) => {
       message: "Content can not be empty!",
     });
   }
-  console.log(request.body);
   const { team } = request.body;
   const teamArr = team.map((member) => new Team(member));
 
@@ -23,5 +22,17 @@ exports.create = (request, response) => {
         });
       }
     } else response.send(data);
+  });
+};
+
+
+exports.findAll = (request, response) => {
+  Team.getAll((err, data) => {
+    if (err) {
+      response.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving teams.",
+      });
+    } else response.send({ teams: data });
   });
 };
