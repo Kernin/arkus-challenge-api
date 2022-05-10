@@ -41,4 +41,34 @@ Team.getAll = (result) => {
   });
 };
 
+Team.getTeamMembers = (id, result) => {
+  const query = `SELECT u.name, u.email FROM user AS u 
+  WHERE EXISTS 
+  (SELECT t.account_id FROM team as t 
+    WHERE t.account_id ='${id}'  AND t.email = u.email)`;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    console.log("team members: ", res);
+    result(null, res);
+  });
+};
+
+Team.getTeamName = (id, result) => {
+  const query = `SELECT DISTINCT name FROM team WHERE account_id ='${id}'`;
+  sql.query(query, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    console.log("team's name: ", res[0]);
+    result(null, res[0]);
+  });
+};
+
 module.exports = Team;

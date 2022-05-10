@@ -67,8 +67,8 @@ Account.getAll = (result) => {
 };
 
 Account.findById = (id, result) => {
-  const query = `SELECT a.name, a.client_name, team.has_team FROM account as a, (
-    SELECT IF(COUNT(1) = 1, 'true', 'false') AS has_team
+  const query = `SELECT a.id, a.name, a.client_name, team.has_team FROM account as a, (
+    SELECT IF(COUNT(1) >= 1, 'true', 'false') AS has_team
     FROM team
     WHERE account_id = '${id}'
 ) as team WHERE id = '${id}'`;

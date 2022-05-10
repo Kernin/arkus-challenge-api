@@ -1,7 +1,7 @@
 const { request } = require("express");
 const Account = require("../../models/account");
 const Manager = require("../../models/manager");
-const Team = require("../../models/team")
+const Team = require("../../models/team");
 
 exports.create = (request, response) => {
   if (!request.body) {
@@ -31,7 +31,7 @@ exports.create = (request, response) => {
         response.send(data);
       } else {
         assignManager(data.id);
-        createTeam(data.id)
+        createTeam(data.id);
       }
     }
   });
@@ -55,16 +55,21 @@ exports.create = (request, response) => {
     });
   };
 
-  const createTeam =(id)=>{
-    const {team:{name,members}} = request.body
-    const today = new Date()
-    const newTeam = members.map(({value:email})=>new Team({
-      email,
-      account_id:id,
-      init_date: today,
-      end_date: '0',
-      name
-    }))
+  const createTeam = (id) => {
+    const {
+      team: { name, members },
+    } = request.body;
+    const today = new Date();
+    const newTeam = members.map(
+      ({ value: email }) =>
+        new Team({
+          email,
+          account_id: id,
+          init_date: today,
+          end_date: "0",
+          name,
+        })
+    );
 
     Team.create(newTeam, (err, data) => {
       if (err) {
@@ -78,9 +83,9 @@ exports.create = (request, response) => {
               err.message || "Some error occurred while creating the Team.",
           });
         }
-      } else response.send({message: 'Account created successfully'});
+      } else response.send({ message: "Account created successfully" });
     });
-  }
+  };
 };
 
 exports.delete = (request, response) => {
@@ -111,19 +116,73 @@ exports.findAll = (request, response) => {
 };
 
 exports.findOne = (request, response) => {
-  Account.findById(request.params.id, (err, data) => {
+  const { id } = request.params;
+  let result = {};
+  Account.findById(id, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         response.status(404).send({
-          message: `Not found Account with id ${request.params.id}.`,
+          message: `Not found Account with id ${id}.`,
         });
       } else {
         response.status(500).send({
-          message: "Error retrieving Account with id " + request.params.id,
+          message: "Error retrieving Account with id " + id,
         });
       }
-    } else response.send({ account: data });
+    } else {
+      const { has_team: hasTeam } = data;
+      result.account = data;
+
+      if (hasTeam === "true") {
+        findManager(id, result);
+      } else {
+        response.send(result);
+      }
+    }
   });
+
+  const findManager = (id, result) => {
+    Manager.getAccountManager(id, (err, data) => {
+      if (err) {
+        response.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving manager.",
+        });
+      } else {
+        result.manager = data;
+        findTeamMembers(id, result);
+      }
+    });
+  };
+
+  const findTeamMembers = (id, result) => {
+    Team.getTeamMembers(id, (err, data) => {
+      if (err) {
+        response.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving team members.",
+        });
+      } else {
+        result.team = data;
+        findTeamName(id,result)
+      }
+    });
+  };
+
+  const findTeamName = (id,result) =>{
+    Team.getTeamName(id, (err, data) => {
+      if (err) {
+        response.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving team's name.",
+        });
+      } else {
+        result.team_name = data;
+        response.send(result);
+      }
+    });
+  }
+
 };
 
 exports.findAllAssigned = (request, response) => {

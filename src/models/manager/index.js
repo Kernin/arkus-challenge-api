@@ -33,6 +33,23 @@ Manager.getAvailableUsers = (result) => {
   });
 };
 
+Manager.getAccountManager = (accountId, result) => {
+  let query = `SELECT u.name, u.email FROM user AS u 
+  WHERE EXISTS 
+  (SELECT ac.account_id FROM accountmanager as ac 
+    WHERE ac.account_id ='${accountId}'  AND ac.email = u.email)`;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    console.log("manager: ", res[0]);
+    result(null, res[0]);
+  });
+};
+
 Manager.remove = (manager, result) => {
   const { email, account_id: accountId } = manager;
 
