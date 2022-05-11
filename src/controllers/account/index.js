@@ -1,6 +1,6 @@
-const { request } = require("express");
 const Account = require("../../models/account");
 const Manager = require("../../models/manager");
+const utils = require("./utils");
 const Team = require("../../models/team");
 
 exports.create = (request, response) => {
@@ -9,8 +9,12 @@ exports.create = (request, response) => {
       message: "Content can not be empty!",
     });
   }
-  console.log(request.body);
-  const { account: newAccount } = request.body;
+
+  const {
+    account: newAccount,
+    manager: managerEmail,
+    team: { name, members },
+  } = request.body;
   const { has_team: hasTeam } = newAccount;
   const account = new Account(newAccount);
 
@@ -30,62 +34,11 @@ exports.create = (request, response) => {
       if (hasTeam === "false") {
         response.send(data);
       } else {
-        assignManager(data.id);
-        createTeam(data.id);
+        utils.assignManager(data.id, managerEmail, response);
+        utils.createTeam(data.id, name, members, response);
       }
     }
   });
-
-  const assignManager = (id) => {
-    const { manager: managerEmail } = request.body;
-    const newManager = new Manager({ email: managerEmail, id });
-    Manager.create(newManager, (err, data) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          response.status(400).send({
-            message: "Manager already assigned.",
-          });
-        } else {
-          response.status(500).send({
-            message:
-              err.message || "Some error occurred while creating the Manager.",
-          });
-        }
-      }
-    });
-  };
-
-  const createTeam = (id) => {
-    const {
-      team: { name, members },
-    } = request.body;
-    const today = new Date();
-    const newTeam = members.map(
-      ({ value: email }) =>
-        new Team({
-          email,
-          account_id: id,
-          init_date: today,
-          end_date: "0",
-          name,
-        })
-    );
-
-    Team.create(newTeam, (err, data) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          response.status(400).send({
-            message: "Team already exists.",
-          });
-        } else {
-          response.status(500).send({
-            message:
-              err.message || "Some error occurred while creating the Team.",
-          });
-        }
-      } else response.send({ message: "Account created successfully" });
-    });
-  };
 };
 
 exports.delete = (request, response) => {
@@ -164,12 +117,12 @@ exports.findOne = (request, response) => {
         });
       } else {
         result.team = data;
-        findTeamName(id,result)
+        findTeamName(id, result);
       }
     });
   };
 
-  const findTeamName = (id,result) =>{
+  const findTeamName = (id, result) => {
     Team.getTeamName(id, (err, data) => {
       if (err) {
         response.status(500).send({
@@ -181,8 +134,7 @@ exports.findOne = (request, response) => {
         response.send(result);
       }
     });
-  }
-
+  };
 };
 
 exports.findAllAssigned = (request, response) => {
@@ -208,9 +160,15 @@ exports.update = (request, response) => {
       message: "Content can not be empty!",
     });
   }
-  console.log(request.body);
-  const { id } = request.body;
-  Account.updateById(new Account(request.body), (err, data) => {
+
+  const {
+    account,
+    action,
+    manager: managerEmail,
+    team: { name, members },
+  } = request.body;
+  const { id } = account;
+  Account.updateById(new Account(account), (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         response.status(404).send({
@@ -221,6 +179,14 @@ exports.update = (request, response) => {
           message: `Error updating Account with id ${id}`,
         });
       }
-    } else response.send(data);
+    } else {
+      if (action === "update") {
+        utils.updateManager(id, managerEmail, response);
+        utils.updateTeam(id, name, members, response);
+      } else {
+        utils.assignManager(id, managerEmail, response);
+        utils.createTeam(id, name, members, response);
+      }
+    }
   });
 };

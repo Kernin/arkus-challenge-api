@@ -72,4 +72,25 @@ Manager.remove = (manager, result) => {
   );
 };
 
+Manager.updateByAccountId = (id, manager,result) =>{
+  const query = `UPDATE accountmanager SET email  = ? WHERE account_id = ? `;
+  sql.query(
+    query,
+    [manager, id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+      console.log("updated manager: ", { id, manager });
+      result(null, { manager });
+    }
+  );
+}
+
 module.exports = Manager;
