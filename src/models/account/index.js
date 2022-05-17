@@ -88,25 +88,6 @@ Account.findById = (id, result) => {
   });
 };
 
-Account.getAllAssigned = (result) => {
-  let query =
-    "SELECT m.id, m.name, m.client_name, m.manager_name, m.email, m.team_name FROM (" +
-    "SELECT a.id, u.name as manager_name, ac.email, ac.account_id, a.name, a.client_name, t.name as team_name " +
-    "FROM accountmanager as ac, account as a, user as u, team as t " +
-    "WHERE ac.account_id = a.id AND ac.email = u.email AND t.account_id = a.id" +
-    ") as m";
-
-  sql.query(query, (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
-    console.log("accounts: ", res);
-    result(null, res);
-  });
-};
-
 Account.updateById = (account, result) => {
   const { name: accountName, client_name: clientName, id } = account;
   sql.query(

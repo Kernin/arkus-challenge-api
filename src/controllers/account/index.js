@@ -137,23 +137,6 @@ exports.findOne = (request, response) => {
   };
 };
 
-exports.findAllAssigned = (request, response) => {
-  Account.getAllAssigned((err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        response.status(404).send({
-          message: `Not found account with id {id} .`,
-        });
-      } else {
-        response.status(500).send({
-          message:
-            err.message || "Some error occurred while retrieving accounts.",
-        });
-      }
-    } else response.send(data);
-  });
-};
-
 exports.update = (request, response) => {
   if (!request.body) {
     response.status(400).send({

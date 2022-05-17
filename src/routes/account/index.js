@@ -9,7 +9,6 @@ module.exports = (app) => {
   router.post("/", account.create);
   router.get("/", account.findAll);
   router.get("/:id", account.findOne)
-  router.get("/assigned_accounts", account.findAllAssigned);
   router.put("/", account.update);
   router.delete("/:account_id", account.delete);
 

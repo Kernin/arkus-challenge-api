@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
 
 //Settings
 app.set("port", process.env.PORT || 3000);
@@ -23,6 +25,13 @@ require("./routes/user")(app);
 require("./routes/account")(app);
 require("./routes/manager")(app);
 require("./routes/team")(app);
+
+//Docs
+app.use(
+  '/api-docs',
+  swaggerUi.serve, 
+  swaggerUi.setup(swaggerDocument)
+);
 
 // Starting the server
 app.listen(app.get("port"), () => {
