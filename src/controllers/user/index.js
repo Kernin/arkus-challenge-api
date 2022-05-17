@@ -49,7 +49,7 @@ exports.update = (request, response) => {
       message: "Content can not be empty!",
     });
   }
-  console.log(request.body);
+
   const { email } = request.body;
   User.updateById(new User(request.body), (err, data) => {
     if (err) {
