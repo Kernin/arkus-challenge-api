@@ -4,12 +4,13 @@ const app = express();
 const morgan = require("morgan");
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
+require("dotenv").config();
 
 //Settings
 app.set("port", process.env.PORT || 3000);
 app.set("json spaces", 2);
 const corsOptions = {
-  origin: "http://localhost:3001",
+  origin: "http://localhost:4000",
 };
 
 //Middleware
